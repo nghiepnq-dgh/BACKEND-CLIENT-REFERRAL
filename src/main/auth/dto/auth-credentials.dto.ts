@@ -22,7 +22,4 @@ export class AuthCredentialsDto {
     @MaxLength(20)
     identity: string;
 
-    @IsOptional()
-    @ArrayContains([ROLE_USER.NORMAL, ROLE_USER.ACCEPTER, ROLE_USER.ADMIN])
-    role: string;
 }

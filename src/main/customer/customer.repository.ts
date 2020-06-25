@@ -1,20 +1,20 @@
 import { Repository, EntityRepository } from 'typeorm';
-import { FileDoc } from './document.entity';
-import { User } from '../auth/user.entity';
 import { CreateDocFileDto } from './dto/create_doc_file.dto';
 import { CreateQueryDto } from './dto/query_param.dto';
 import { ROLE_USER } from 'src/contants';
 import { BadRequestException } from '@nestjs/common';
+import { Customer } from './customer.entity';
+import { Client } from '../auth/client.entity';
 
-@EntityRepository(FileDoc)
-export class DocumentRepository extends Repository<FileDoc> {
+@EntityRepository(Customer)
+export class CustomerRepository extends Repository<Customer> {
   async createDocumentRepository(
     createDocFileDto: CreateDocFileDto,
-    user: User,
+    client: Client,
   ) {
     const { email, contend, identity } = createDocFileDto;
-    const document = new FileDoc();
-    document.user = user;
+    const document = new Customer();
+    document.client = client;
     document.contend = contend;
     //save document
     console.log('document', document);
@@ -25,8 +25,8 @@ export class DocumentRepository extends Repository<FileDoc> {
     return result;
   }
 
-  async getAllDocRepository(user: User, createQueryDto: CreateQueryDto) {
-    const { role, id } = user;
+  async getAllDocRepository(client: Client, createQueryDto: CreateQueryDto) {
+    const { id } = client;
     const { limit, page, document_id: documentId } = createQueryDto;
 
     const _limit = limit ? limit : 10;
@@ -38,11 +38,7 @@ export class DocumentRepository extends Repository<FileDoc> {
       where['skip'] = (+page - 1) * +_limit;
       where['take'] = +_limit;
     }
-
-    if (role === ROLE_USER.NORMAL) {
-      where['userId'] = id;
-    }
-
+    
     if (documentId) {
       where['id'] = documentId;
     }

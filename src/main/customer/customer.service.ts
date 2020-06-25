@@ -1,32 +1,26 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DocumentRepository } from './document.repository';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CreateDocFileDto } from './dto/create_doc_file.dto';
-import { UserRepository } from '../auth/user.repository';
 import * as QRCode from 'qrcode';
 import { AuthCredentialsDto } from '../auth/dto/auth-credentials.dto';
-import passport = require('passport');
-import { User } from '../auth/user.entity';
 import { CreateQueryDto } from './dto/query_param.dto';
-import { History } from '../history/history.entity';
-import { HistoryRepository } from '../history/history.repository';
+import { CustomerRepository } from './customer.repository';
+import { Client } from '../auth/client.entity';
+import { ClientRepository } from '../auth/client.repository';
 
 @Injectable()
-export class DocumentService {
+export class CustomerService {
   constructor(
-    @InjectRepository(DocumentRepository)
-    private documentRepository: DocumentRepository,
+    private customerRepository: CustomerRepository,
     private readonly mailerService: MailerService,
-    private readonly userRepository: UserRepository,
-    private readonly historyRepository: HistoryRepository,
+    private readonly clientRepository: ClientRepository,
   ) {}
 
   async createDocService(createDocFileDto: CreateDocFileDto) {
     let user;
     let isUser = true;
     const { identity, email } = createDocFileDto;
-    user = await this.userRepository.findUserRepository(identity);
+    user = await this.clientRepository.findUserRepository(identity);
 
     if (user && email === user.email) {
       throw new BadRequestException(
@@ -43,9 +37,9 @@ export class DocumentService {
       userDto.password = '12345678';
       userDto.identity = identity;
       userDto.address = '';
-      user = await this.userRepository.singUp(userDto);
+      user = await this.clientRepository.singUp(userDto);
     }
-    const result = await this.documentRepository.createDocumentRepository(
+    const result = await this.customerRepository.createDocumentRepository(
       createDocFileDto,
       user,
     );
@@ -101,23 +95,12 @@ export class DocumentService {
     return result;
   }
 
-  async getAllDoc(user: User, createQueryDto: CreateQueryDto) {
-    const result = await this.documentRepository.getAllDocRepository(
-      user,
+  async getAllDoc(client: Client, createQueryDto: CreateQueryDto) {
+    const result = await this.customerRepository.getAllDocRepository(
+      client,
       createQueryDto,
     );
     return result;
   }
 
-  async getDocByIdService(id: number, login: boolean) {
-    const result = await this.documentRepository.getDocByIdRepository(id);
-    //If have login add history when search doc file
-    if (login) {
-      await this.historyRepository.save({
-        user: result.user,
-        document: result,
-      });
-    }
-    return result;
-  }
 }

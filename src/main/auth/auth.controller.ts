@@ -2,9 +2,9 @@ import { Controller, Post, Body, ValidationPipe, UseGuards, Req, Request } from 
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
-import { User } from './user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../../decorator/get-user.decorator';
+import { Client } from './client.entity';
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -30,7 +30,7 @@ export class AuthController {
 
     @Post("/me")
     @UseGuards(AuthGuard())
-    test(@GetUser() user: User) {
-        console.log(user);
+    test(@GetUser() client: Client) {
+        return client;
     }
 }

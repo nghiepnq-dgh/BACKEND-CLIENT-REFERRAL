@@ -1,20 +1,19 @@
 import { Repository, EntityRepository } from 'typeorm';
-import { User } from './user.entity';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import * as bcrypt from 'bcrypt';
 import { BadRequestException } from '@nestjs/common';
-import { userInfo } from 'os';
 import { AuthLoginDto } from './dto/auth-login.dto';
+import { Client } from './client.entity';
 
-@EntityRepository(User)
-export class UserRepository extends Repository<User> {
+@EntityRepository(Client)
+export class ClientRepository extends Repository<Client> {
 
     //TODO HASH PASSWORD TO SAVE DATA
     private async hashPassword(password: string, salt: string): Promise<string> {
         return bcrypt.hash(password, salt);
     }
 
-    async findUserRepository(identity: string): Promise<User> {
+    async findUserRepository(identity: string): Promise<Client> {
         const result = await this.findOne({identity});
         return result;
     }
@@ -32,7 +31,7 @@ export class UserRepository extends Repository<User> {
     }
 
     //TODO REGISTER USER
-    async singUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
+    async singUp(authCredentialsDto: AuthCredentialsDto): Promise<Client> {
         const { name, password, address, identity, email } = authCredentialsDto;
 
         //Check duplicate indentity
@@ -48,7 +47,7 @@ export class UserRepository extends Repository<User> {
 
         const salt = await bcrypt.genSalt();
 
-        const user = new User();
+        const user = new Client();
         user.name = name;
         user.password = await this.hashPassword(password, salt);
         user.address = address;
