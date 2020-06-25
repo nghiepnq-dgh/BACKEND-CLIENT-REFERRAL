@@ -15,7 +15,7 @@ import { ClientRepository } from './client.repository';
     JwtModule.register({
       secret: 'topSecert51',
       signOptions: {
-        expiresIn: 36000000000000,
+        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRED,
       },
     }),
     TypeOrmModule.forFeature([ClientRepository]),

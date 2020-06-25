@@ -1,10 +1,11 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Unique,  TreeChildren, TreeParent, Tree } from "typeorm";
 import { IsOptional, IsNotEmpty, IsEmail } from "class-validator";
 import * as bcrypt from 'bcrypt';
-import { Customer } from "../customer/customer.entity";
+import { USER_ROLE } from "src/commom/constants";
 @Entity()
 @Unique(['identity', 'email'])
-export class Client extends BaseEntity {
+@Tree("materialized-path")
+export class Client  {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -29,11 +30,21 @@ export class Client extends BaseEntity {
     @Column()
     salt: string;
 
-    @OneToMany(type => Customer, customer => customer.client)
-    customers: Customer[];
+    @Column()
+    role: USER_ROLE;
+
+    @TreeChildren()
+    children: Client[];
+
+    @TreeParent()
+    parent: Client;
+
+    // @OneToMany(type => Customer, customer => customer.client)
+    // customers: Customer[];
 
     async validdatePassword(password: string): Promise<boolean> {
         const hash = await bcrypt.hash(password, this.salt);
         return hash === this.password;
     }
 }
+

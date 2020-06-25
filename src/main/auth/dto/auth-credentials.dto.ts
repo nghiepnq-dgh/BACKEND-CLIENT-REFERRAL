@@ -1,25 +1,29 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, IsOptional, ArrayContains } from 'class-validator';
-import { ROLE_USER } from 'src/contants';
+import { IsEmail, MaxLength, Contains } from 'class-validator';
+import { USER_ROLE } from 'src/commom/constants';
+import { ApiProperty } from '@nestjs/swagger';
 export class AuthCredentialsDto {
-    @IsString()
-    @MinLength(8)
+    @ApiProperty()
     @MaxLength(20)
     name: string;
 
+    @ApiProperty()
     @IsEmail()
     email: string;
 
-    @IsString()
-    @MinLength(6)
+    @ApiProperty()
     @MaxLength(20)
     password: string;
 
     @MaxLength(100)
-    @IsOptional()
+    @ApiProperty()
     address: string;
 
-    @IsString()
+    @MaxLength(100)
+    @ApiProperty({default: USER_ROLE.CUSTOMER, enum: USER_ROLE})
+    @Contains(USER_ROLE.CUSTOMER)
+    role: USER_ROLE;
+
+    @ApiProperty()
     @MaxLength(20)
     identity: string;
-
 }

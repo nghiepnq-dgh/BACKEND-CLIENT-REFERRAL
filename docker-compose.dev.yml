@@ -1,0 +1,45 @@
+version: '3'
+networks:
+  app-tier:
+    driver: bridge
+volumes:
+  pgdata:
+services:
+  postgres:
+    container_name: postgres_client
+    image: postgres:11
+    ports:
+      - "25432:5432"
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      PG_DATA: /var/lib/postgresql/data
+    networks:
+      - app-tier
+  adminer:
+    container_name: client_adminer
+    image: adminer
+    depends_on:
+      - postgres 
+    restart: always
+    ports:
+      - 19000:8080
+    networks:
+      - app-tier
+  # redis:
+  #   container_name: referral_redis
+  #   image: 'bitnami/redis:latest'
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 6379:6379
+  #   networks:
+  #     - app-tier
+  #   sysctls:                                                                     
+  #     - net.core.somaxconn=1024
+ 

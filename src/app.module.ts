@@ -7,13 +7,16 @@ import { AuthModule } from './main/auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { CustomerModule } from './main/customer/customer.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot(typeOrmConfig),
     AuthModule,
-    CustomerModule,
     MailerModule.forRootAsync({
       useFactory: () => ({
         // transport: 'smtps://user@domain.com:pass@smtp.domain.com',
@@ -24,8 +27,6 @@ import { CustomerModule } from './main/customer/customer.module';
             user: "testqrtl@gmail.com",
             pass: "01634490536",
           },
-          // secure: false,
-          // tls: { rejectUnauthorized: false },
         },
         template: {
           dir: path.resolve(__dirname, 'templates'),          

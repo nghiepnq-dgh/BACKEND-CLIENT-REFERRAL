@@ -1,0 +1,57 @@
+version: '3'
+networks:
+  app-tier:
+    driver: bridge
+volumes:
+  pgdata:
+services:
+  postgres:
+    container_name: postgres_client
+    image: postgres:11
+    ports:
+      - "25432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      PG_DATA: /var/lib/postgresql/data
+    networks:
+      - app-tier
+  adminer:
+    container_name: client_adminer
+    image: adminer
+    depends_on:
+      - postgres_client
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - app-tier
+  api:
+    container_name: referral_api
+    image: "node:10.18.0"
+    user: "root"
+    restart: always
+    ports:
+      - "8000:8000"
+    working_dir: /home/node/app
+    volumes:
+      - ./:/home/node/app
+    depends_on:
+      - postgres
+    command: "npm run start:dev"
+    networks:
+      - app-tier
+  # redis:
+  #   container_name: referral_redis
+  #   image: 'bitnami/redis:latest'
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 16379:6379
+  #   networks:
+  #     - app-tier

@@ -1,36 +1,57 @@
-import { Controller, Post, Body, ValidationPipe, UseGuards, Req, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  ValidationPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../../decorator/get-user.decorator';
 import { Client } from './client.entity';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
-    constructor(
-        private authService: AuthService
-    ) { }
+  constructor(private authService: AuthService) {}
 
-    @Post('/signup')
-    async signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto) {
-        const result = await this.authService.signUp(authCredentialsDto);
-        return { success: true, result };
-    }
+  @ApiOperation({
+    summary: '[API] Register - Customer đăng kí',
+  })
+  @Post('/signup')
+  async signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto) {
+    const result = await this.authService.signUp(authCredentialsDto);
+    return { success: true, result };
+  }
 
-    @Post('/seed_user')
-    async seedUser() {
-        const result = await this.authService.seedUserServicer();
-        return {success: true, result};
-    }
+  @ApiOperation({
+    summary: '[API] Seed admin - Gọi lần đầu tiên khi chạy',
+  })
+  @Post('/seed_user')
+  async seedUser() {
+    const result = await this.authService.seedUserServicer();
+    return { success: true, result };
+  }
 
-    @Post('/signin')
-    signIn(@Body(ValidationPipe) authLoginDto: AuthLoginDto): Promise<{ acccessToken: string }> {
-        return this.authService.signIn(authLoginDto);
-    }
+  @ApiOperation({
+    summary: '[API] Login - Dang nhap',
+  })
+  @Post('/signin')
+  signIn(
+    @Body(ValidationPipe) authLoginDto: AuthLoginDto,
+  ): Promise<{ acccessToken: string }> {
+    return this.authService.signIn(authLoginDto);
+  }
 
-    @Post("/me")
-    @UseGuards(AuthGuard())
-    test(@GetUser() client: Client) {
-        return client;
-    }
+  @ApiOperation({
+    summary: '[API] Get info - Lấy thông tin cá nhân',
+  })
+  @Post('/me')
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth()
+  test(@GetUser() client: Client) {
+    return client;
+  }
 }

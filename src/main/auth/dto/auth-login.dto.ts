@@ -1,13 +1,13 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, IsOptional, ArrayContains } from 'class-validator';
-import { ROLE_USER } from 'src/contants';
+import { IsEmail, MinLength, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 export class AuthLoginDto {
-    @IsString()
-    @MaxLength(20)
-    identity: string;
+  @ApiProperty()
+  @MaxLength(20)
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    @MinLength(8)
-    @MaxLength(20)
-    password: string;
-  
+  @ApiProperty()
+  @MinLength(8)
+  @MaxLength(20)
+  password: string;
 }
