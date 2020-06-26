@@ -7,6 +7,7 @@ export const userDb = [
         password: "12345678",
         address: 'This is my address',
         identity: '134343432',
-        role: USER_ROLE.CLIENT
+        role: USER_ROLE.CLIENT,
+        inviterId: '',
     },
 ]

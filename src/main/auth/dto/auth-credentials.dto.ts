@@ -1,10 +1,13 @@
 import { IsEmail, MaxLength, Contains } from 'class-validator';
 import { USER_ROLE } from 'src/commom/constants';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class AuthCredentialsDto {
     @ApiProperty()
     @MaxLength(20)
     name: string;
+
+    @ApiPropertyOptional({nullable: true})
+    inviterId: string
 
     @ApiProperty()
     @IsEmail()

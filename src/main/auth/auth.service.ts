@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interface/jwt-payload.interface';
 import { userDb } from '../seed/user_db_seed';
 import { ClientRepository } from './client.repository';
+import { ReferralService } from 'src/referral/referral.service';
+import { Config } from 'src/config/configuration';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
         @InjectRepository(ClientRepository)
         private userRepository: ClientRepository,
         private jwtService: JwtService,
+        private referralService: ReferralService,
     ) { }
 
     async findUser(identity: string) {
@@ -24,12 +27,13 @@ export class AuthService {
         const result = await Promise.all(userDb.map(async item => {
            return await this.signUp(item);
         }))
-        console.log("DEBUG_CODE: AuthService -> seedUserServicer -> result", result);
         return result;
     }
 
     async signUp(authCredentialsDto: AuthCredentialsDto) {
-        return await this.userRepository.singUp(authCredentialsDto);
+        const result =  await this.userRepository.singUp(authCredentialsDto);
+        await this.referralService.createCustomerReferral({name: result.name, inviterId: authCredentialsDto.inviterId, clientCustomerId: result.id, email: result.email})
+        return result;
     }
 
     async signIn(authLoginDto: AuthLoginDto): Promise<{ acccessToken: string }> {

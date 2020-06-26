@@ -53,23 +53,11 @@ export class ClientRepository extends Repository<Client> {
     if (exitsEmail) {
       throw new BadRequestException('Email không được trùng');
     }
-
     if (role === USER_ROLE.CLIENT) {
-        const admin = await this.findOne({ role: USER_ROLE.CLIENT });
-        console.log("DEBUG_CODE: singUp -> admin", admin);
-        if (admin) throw new BadRequestException('CANNOT CREATE ADMIN');
-        const salt = await bcrypt.genSalt();
-        const user = new Client();
-        user.name = name;
-        user.password = await this.hashPassword(password, salt);
-        user.address = address;
-        user.identity = identity;
-        user.salt = salt;
-        user.email = email;
-        user.role = role;
-        const result = await this.save(user);
-        return result;
-    } else {
+      const admin = await this.findOne({ role: USER_ROLE.CLIENT });
+      if (admin) throw new BadRequestException('CANNOT CREATE ADMIN');
+    }
+
     const salt = await bcrypt.genSalt();
     const user = new Client();
     user.name = name;
@@ -79,10 +67,8 @@ export class ClientRepository extends Repository<Client> {
     user.salt = salt;
     user.email = email;
     user.role = role;
-    
-    console.log("DEBUG_CODE: singUp -> user", user);
+
     const result = await this.save(user);
     return result;
-    }
   }
 }

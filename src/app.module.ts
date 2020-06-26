@@ -8,6 +8,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigModule } from '@nestjs/config';
+import { ReferralModule } from './referral/referral.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ConfigModule } from '@nestjs/config';
         },
       }),
     }),
+    ReferralModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, HttpModule } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,9 +6,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.stratefy';
 import { ClientRepository } from './client.repository';
+import { ReferralService } from 'src/referral/referral.service';
 
 @Module({
   imports: [
+    HttpModule,
     PassportModule.register({
       defaultStrategy: 'jwt'
     }),
@@ -22,7 +24,8 @@ import { ClientRepository } from './client.repository';
   ],
   controllers: [AuthController],
   providers: [AuthService,
-    JwtStrategy
+    JwtStrategy,
+    ReferralService
   ],
   exports: [
     JwtStrategy,
