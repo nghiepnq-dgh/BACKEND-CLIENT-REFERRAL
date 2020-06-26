@@ -67,7 +67,7 @@ export class ReferralService {
         baseURL: Config.API_REFERRAL_SERVICE,
         url,
         method: method,
-        timeout: 30000,
+        timeout: 80000,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -77,6 +77,7 @@ export class ReferralService {
       if (response && response.data) {
         const { data } = response;
         return {
+          success: true,
           code: 200,
           data,
           message: 'OK',
@@ -131,20 +132,48 @@ export class ReferralService {
     }
   }
 
-  async createCustomerReferral({ name,inviterId,clientCustomerId, email }) {
+  async createCustomerReferral({ name, inviterId, clientCustomerId, email }) {
     const response = await this._sendRequestWithAuth({
-        url: `${Config.API_REFERRAL_SERVICE}/v2/customer`,
-        method: 'POST',
-        data: { name, inviterId, clientCustomerId, email },
-    })
-    if (response) {
-        this.logger.log(
-            `[Refferal] Create customer success | ${JSON.stringify(response)}`,
-        );
+      url: `${Config.API_REFERRAL_SERVICE}/v2/customer`,
+      method: 'POST',
+      data: { name, inviterId, clientCustomerId, email },
+    });
+    if (response && response.success) {
+      this.logger.log(
+        `[Refferal] Create customer success | ${JSON.stringify(response)}`,
+      );
     } else {
-        this.logger.log(
-            `[Refferal] Create customer false | ${response.message} - ${response.code}`,
-        );
+      this.logger.error(
+        `[Refferal] Create customer false | ${response.message} - ${response.code}`,
+      );
+    }
+  }
+
+  async createOrderReferral(price, customerId) {
+    const data = {
+      customerId: customerId,
+      amount: price,
+      currency: 'vnd',
+      paymentMethod: 'bank-contact',
+      receiptEmail: Config.EMAIL_CLIENT,
+      product: 'Macbook 2025',
+      code: '7000000',
+      description: 'description',
+    };
+    const response = await this._sendRequestWithAuth({
+      url: `${Config.API_REFERRAL_SERVICE}/v2/payment-order`,
+      method: 'POST',
+      data,
+    });
+    console.log('DEBUG_CODE: createOrderReferral -> response', response);
+    if (response && response.success) {
+      this.logger.log(
+        `[Refferal] Create customer success | ${JSON.stringify(response)}`,
+      );
+    } else {
+      this.logger.error(
+        `[Refferal] Create customer false | ${response.message} - ${response.code}`,
+      );
     }
   }
 }
