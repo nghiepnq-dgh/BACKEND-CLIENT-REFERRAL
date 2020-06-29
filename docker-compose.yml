@@ -25,7 +25,7 @@ services:
     container_name: client_adminer
     image: adminer
     depends_on:
-      - postgres_client
+      - postgres
     restart: always
     ports:
       - 8080:8080
