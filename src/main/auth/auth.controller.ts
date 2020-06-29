@@ -4,6 +4,7 @@ import {
   Body,
   ValidationPipe,
   UseGuards,
+  Redirect,
 } from '@nestjs/common';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
@@ -12,6 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../../decorator/get-user.decorator';
 import { Client } from './client.entity';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { SSODto } from './dto/sso.dto';
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
@@ -43,6 +45,17 @@ export class AuthController {
     @Body(ValidationPipe) authLoginDto: AuthLoginDto,
   ): Promise<{ acccessToken: string }> {
     return this.authService.signIn(authLoginDto);
+  }
+
+  @ApiOperation({
+    summary: '[API] Login SSO - Dang nhap sso referral',
+  })
+  @Post('/login-to-referral')
+  async loginSSO(
+    @Body() data: SSODto,
+    ){
+    const result = await this.authService.ssoService(data);
+    return { url: result?.url };
   }
 
   @ApiOperation({

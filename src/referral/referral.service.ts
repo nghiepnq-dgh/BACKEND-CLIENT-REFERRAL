@@ -176,4 +176,23 @@ export class ReferralService {
       );
     }
   }
+
+  async ssoReferral(id) {
+    const response = await this._sendRequestWithAuth({
+      url: `${Config.API_REFERRAL_SERVICE}/v2/auth/customer-sso-token`,
+      method: 'POST',
+      data: { id },
+    });
+    console.log('DEBUG_CODE: ssoReferral -> response', response);
+    if (response && response.success) {
+      this.logger.log(
+        `[Refferal] Create customer success | ${JSON.stringify(response)}`,
+      );
+      return response.data;
+    } else {
+      this.logger.error(
+        `[Refferal] Create customer false | ${response.message} - ${response.code}`,
+      );
+    }
+  }
 }
